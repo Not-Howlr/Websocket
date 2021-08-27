@@ -4,9 +4,8 @@
   "description": "websocket server",
   "main": "build/index.js",
   "scripts": {
-    "prebuild": "eslint --fix --ext .ts,.tsx .",
+    "lint": "eslint --fix --ext .ts,.tsx .",
     "build": "tsc",
-    "prestart": "npm run build",
     "watch": "tsc --watch",
     "start": "node ."
   },
