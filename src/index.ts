@@ -1,11 +1,11 @@
 import "dotenv/config";
 
-import { Server } from "./Services/Server";
+import { Handler } from "./Services/Handler";
 
 (async () => {
 	try {
-		await Server.Start();
+		await Handler.Init();
 	} catch (e) {
-		throw Error(e);
+		throw Error(`${e}`);
 	}
 })();

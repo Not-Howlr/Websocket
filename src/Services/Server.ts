@@ -1,53 +1,30 @@
-import { Server as Instance, Socket } from "socket.io";
+import { Server as Instance } from "socket.io";
 
-import { Config } from "../Helpers/Config";
+import { Config } from "./Config";
+import { Database } from "./Database";
 
 export class Server {
 
 	private static options = {
-		withCredentials: true,
 		cors: {
+			allowedHeaders: ["jid"],
+			credentials: true,
 			origin: "*",
 			methods: ["GET", "POST"]
 		}
 	};
 
-	public static App = new Instance(Server.options);
-
-	private static Error(socket: Socket, error: Error | any): void {
-		try {
-			socket.emit("error", { ok: false, data: error });
-		} catch (e) {
-			throw new Error(e);
-		}
-	}
-
-	private static Respond(socket: Socket, payload: any): void {
-		try {
-			socket.emit("response", { ok: true, data: payload.data });
-		} catch (e) {
-			Server.Error(socket, e);
-		}
-	}
-
-	public static async Connect(socket: Socket): Promise<void> {
-		try {
-			await socket.join(socket.id);
-			Server.Respond(socket, `joined room ${socket.id}`);
-		} catch (e) {
-			Server.Error(socket, e);
-		}
-	}
+	// public static App = require("socket.io")(http.createServer(), Server.options);
+	public static App = new Instance(Server.options)
 
 	public static async Start(): Promise<void> {
 		try {
+			await Database.Connect();
 			Server.App.listen(Config.Options.PORT);
-			console.log(`socket client serving on http://${Config.Options.DOMAIN}:${Config.Options.PORT}/socket.io/socket.io.js`);
-			Server.App.on("connection", async (socket: Socket) => {
-				await Server.Connect(socket);
-			});
+			console.log(`socket client serving on http://${Config.Options.HOST}:${Config.Options.PORT}/socket.io/socket.io.js`);
 		} catch (error) {
-			throw new Error(error);
+			await Database.Close();
+			throw new Error(`${error}`);
 		}
 	}
 }
