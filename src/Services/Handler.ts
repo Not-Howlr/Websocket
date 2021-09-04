@@ -94,7 +94,7 @@ export class Handler {
 			content: data.content,
 			sent: new Date(data.sent)
 		});
-		Handler.RecieveMessage(socket, data.to, data);
+		Handler.RecieveMessage(socket, data.to, { ...data, from: user.username });
 		Handler.Respond(socket, "message sent");
 	}
 
@@ -121,6 +121,7 @@ export class Handler {
 				await Handler.Connect(socket);
 				socket.on(HandlerTypes.SEND_MESSAGE, async (data: INewMessage) => await Handler.SendMessage(socket, data));
 			} catch (error) {
+				console.log(error);
 				Handler.Error(socket, error);
 			}
 		});
